@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8" />
@@ -186,7 +186,7 @@
      CONFIG (可調整設定)
      ===================== */
   const WIN_RATE = 0.30;               // 中獎機率 30%
-  const DAILY_LIMIT = 1;               // 每日可玩次數（每台裝置）
+  const DAILY_LIMIT = 0;               // 每日可玩次數（每台裝置）
   const STORAGE_KEY = 'solhotel_luckydraw_playcount_v1';
   const PRIZE_TEXT_ZH = '恭喜中獎！請截圖此畫面並於入住期間出示給櫃檯人員兌換。';
   const PRIZE_TEXT_EN = 'Congratulations! Please screenshot this page and present it at the front desk to redeem your gift during your stay.';
