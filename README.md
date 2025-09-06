@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
@@ -27,10 +27,31 @@
       background-color: #ffc107;
       border-radius: 15px;
       cursor: pointer;
-      transition: transform 0.3s;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      position: relative;
     }
-    .box:hover {
-      transform: scale(1.1);
+    .box.opened {
+      transform: rotateY(180deg);
+    }
+    .box-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+      border-radius: 15px;
+    }
+    .box-front {
+      background-color: #ffc107;
+    }
+    .box-back {
+      background-color: #ff5722;
+      color: white;
+      transform: rotateY(180deg);
     }
     #result {
       margin-top: 20px;
@@ -62,9 +83,18 @@
   <p id="desc">點擊任一禮盒看看您是否中獎！</p>
 
   <div class="game-area">
-    <div class="box" onclick="play(this)"></div>
-    <div class="box" onclick="play(this)"></div>
-    <div class="box" onclick="play(this)"></div>
+    <div class="box" onclick="play(this)">
+      <div class="box-face box-front">🎁</div>
+      <div class="box-face box-back">🎉</div>
+    </div>
+    <div class="box" onclick="play(this)">
+      <div class="box-face box-front">🎁</div>
+      <div class="box-face box-back">🎉</div>
+    </div>
+    <div class="box" onclick="play(this)">
+      <div class="box-face box-front">🎁</div>
+      <div class="box-face box-back">🎉</div>
+    </div>
   </div>
 
   <div id="result"></div>
@@ -86,15 +116,18 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    function play(element) {
-      const win = Math.random() < WIN_RATE;
-      document.getElementById('result').innerText = win ?
-        (currentLang === 'zh' ? '🎊 恭喜中獎！請至櫃檯領取獎品 🎊' : '🎊 Congratulations! You won! Please claim your prize at the front desk 🎊') :
-        (currentLang === 'zh' ? '💡 謝謝參加，祝您下次好運！' : '💡 Thank you for playing, better luck next time!');
-      if (win) {
-        winSound.currentTime = 0;
-        winSound.play();
-        launchFireworks();
+    function play(box) {
+      if (!box.classList.contains('opened')) {
+        box.classList.add('opened');
+        const win = Math.random() < WIN_RATE;
+        document.getElementById('result').innerText = win ?
+          (currentLang === 'zh' ? '🎊 恭喜中獎！請至櫃檯領取獎品 🎊' : '🎊 Congratulations! You won! Please claim your prize at the front desk 🎊') :
+          (currentLang === 'zh' ? '💡 謝謝參加，祝您下次好運！' : '💡 Thank you for playing, better luck next time!');
+        if (win) {
+          winSound.currentTime = 0;
+          winSound.play();
+          launchFireworks();
+        }
       }
     }
 
@@ -136,4 +169,3 @@
   </script>
 </body>
 </html>
-
