@@ -1,4 +1,5 @@
 
+
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
@@ -30,6 +31,7 @@
       transition: transform 0.6s;
       transform-style: preserve-3d;
       position: relative;
+      font-size: 2em;
     }
     .box.opened {
       transform: rotateY(180deg);
@@ -42,7 +44,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.5em;
       border-radius: 15px;
     }
     .box-front {
@@ -82,18 +83,18 @@
   <h1 id="title">🎉 SOL Hotel 抽獎活動 🎉</h1>
   <p id="desc">點擊任一禮盒看看您是否中獎！</p>
 
-  <div class="game-area">
+  <div class="game-area" id="gameArea">
     <div class="box" onclick="play(this)">
       <div class="box-face box-front">🎁</div>
-      <div class="box-face box-back">🎉</div>
+      <div class="box-face box-back"></div>
     </div>
     <div class="box" onclick="play(this)">
       <div class="box-face box-front">🎁</div>
-      <div class="box-face box-back">🎉</div>
+      <div class="box-face box-back"></div>
     </div>
     <div class="box" onclick="play(this)">
       <div class="box-face box-front">🎁</div>
-      <div class="box-face box-back">🎉</div>
+      <div class="box-face box-back"></div>
     </div>
   </div>
 
@@ -102,7 +103,6 @@
   <audio id="winSound" src="https://www.soundjay.com/buttons/sounds/button-4.mp3" preload="auto"></audio>
 
   <script>
-    const WIN_RATE = 0.30; // 30% 中獎率
     let currentLang = 'zh';
     const canvas = document.getElementById('fireworks');
     const ctx = canvas.getContext('2d');
@@ -116,19 +116,31 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    function play(box) {
-      if (!box.classList.contains('opened')) {
-        box.classList.add('opened');
-        const win = Math.random() < WIN_RATE;
-        document.getElementById('result').innerText = win ?
-          (currentLang === 'zh' ? '🎊 恭喜中獎！請至櫃檯領取獎品 🎊' : '🎊 Congratulations! You won! Please claim your prize at the front desk 🎊') :
-          (currentLang === 'zh' ? '💡 謝謝參加，祝您下次好運！' : '💡 Thank you for playing, better luck next time!');
-        if (win) {
-          winSound.currentTime = 0;
-          winSound.play();
-          launchFireworks();
-        }
+    function play(clickedBox) {
+      const boxes = Array.from(document.querySelectorAll('.box'));
+      // 生成一個中獎分配，保證至少一個中獎
+      let winIndexes = [];
+      while(winIndexes.length === 0) {
+        boxes.forEach((box, i) => {
+          if(Math.random() < 0.3) winIndexes.push(i);
+        });
       }
+      // 分配結果到盒子
+      boxes.forEach((box, i) => {
+        if(!box.classList.contains('opened')) {
+          box.classList.add('opened');
+          const isWin = winIndexes.includes(i);
+          box.querySelector('.box-back').textContent = isWin ? '🎉' : '😊';
+          if(isWin && box === clickedBox){
+            winSound.currentTime = 0;
+            winSound.play();
+            launchFireworks();
+            document.getElementById('result').innerText = currentLang === 'zh' ? '🎊 恭喜中獎！請至櫃檯領取獎品 🎊' : '🎊 Congratulations! You won! Please claim your prize at the front desk 🎊';
+          } else if(box === clickedBox && !isWin){
+            document.getElementById('result').innerText = currentLang === 'zh' ? '💡 謝謝參加，祝您下次好運！' : '💡 Thank you for playing, better luck next time!';
+          }
+        }
+      });
     }
 
     function toggleLang() {
@@ -154,7 +166,7 @@
 
     function animateFireworks() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach((p, i) => {
+      particles.forEach((p) => {
         p.x += Math.cos(p.angle) * p.speed;
         p.y += Math.sin(p.angle) * p.speed;
         p.alpha -= 0.01;
